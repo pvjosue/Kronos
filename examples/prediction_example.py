@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+from pathlib import Path
+
 sys.path.append("../")
 from model import Kronos, KronosTokenizer, KronosPredictor
 
@@ -46,11 +48,12 @@ model = Kronos.from_pretrained("NeoQuasar/Kronos-small")
 predictor = KronosPredictor(model, tokenizer, max_context=512)
 
 # 3. Prepare Data
-df = pd.read_csv("./data/XSHG_5min_600977.csv")
+data_path = Path(__file__).resolve().parents[1] / "data" / "GC=F_5min.csv"
+df = pd.read_csv(data_path)
 df['timestamps'] = pd.to_datetime(df['timestamps'])
 
 lookback = 400
-pred_len = 120
+pred_len = 112
 
 x_df = df.loc[:lookback-1, ['open', 'high', 'low', 'close', 'volume', 'amount']]
 x_timestamp = df.loc[:lookback-1, 'timestamps']
@@ -77,4 +80,3 @@ kline_df = df.loc[:lookback+pred_len-1]
 
 # visualize
 plot_prediction(kline_df, pred_df)
-
